@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "lib": ["es6", "dom", "es2017"],
+    "target": "es5",
+    "moduleResolution": "node",
+    "outDir": "build"
+  }
+}
