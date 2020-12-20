@@ -1,2 +1,2 @@
 # reactdocs-server
-Repo containing reactdocs extension server code
+Repo containing reactdocs extension server code.

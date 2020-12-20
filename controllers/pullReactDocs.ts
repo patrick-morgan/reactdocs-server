@@ -4,6 +4,7 @@ import { mkdir, writeFile } from 'fs/promises';
 import axios from 'axios';
 
 import ReactReferenceParser from '../parsers/ReactReferenceParser';
+import getDBConnection from '../db';
 
 const reactReferenceUrl = "https://raw.githubusercontent.com/reactjs/reactjs.org/master/content/docs/reference-react.md";
 const reactComponentReferenceUrl = "https://raw.githubusercontent.com/reactjs/reactjs.org/master/content/docs/reference-react-component.md";
@@ -12,12 +13,8 @@ const hooksReferenceUrl = "https://raw.githubusercontent.com/reactjs/reactjs.org
 (async () => {
   const urls = [reactReferenceUrl, reactComponentReferenceUrl, hooksReferenceUrl];
 
-  // prepare directory
-  const dirPath = `${__dirname}/../../docs`;
-  const dirExists = existsSync(dirPath);
-  if (!dirExists) {
-    await mkdir(dirPath);
-  }
+  // prepare db connection
+  const db = await getDBConnection();
 
   const promises = [];
 
@@ -25,11 +22,7 @@ const hooksReferenceUrl = "https://raw.githubusercontent.com/reactjs/reactjs.org
     const data = await axios.get(url);
     const parser = new ReactReferenceParser(data.data);
     const components = parser.parse();
-    for (const component of components) {
-      const json = JSON.stringify(component, null, 2);
-      const filename = component.name;
-      promises.push(writeFile(`${dirPath}/${filename}.json`, json));
-    }
+    promises.push(db.collection("docs").insertMany(components));
   }
 
   // wait for all file writes to finish
